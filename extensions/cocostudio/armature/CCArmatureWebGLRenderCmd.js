@@ -44,6 +44,7 @@
         var alphaPremultiplied = cc.BlendFunc.ALPHA_PREMULTIPLIED, alphaNonPremultipled = cc.BlendFunc.ALPHA_NON_PREMULTIPLIED;
         for (var i = 0, len = locChildren.length; i < len; i++) {
             var selBone = locChildren[i];
+            var boneCmd = selBone._renderCmd;
             if (selBone && selBone.getDisplayRenderNode) {
                 var selNode = selBone.getDisplayRenderNode();
                 if (null === selNode)
@@ -79,28 +80,28 @@
                         cmd._parentCmd = this;
                         // Continue rendering in default
                     default:
+                        boneCmd._syncStatus(parentCmd);
+                        cmd._syncStatus(boneCmd);
                         if (cmd.uploadData) {
                             cc.renderer._uploadBufferData(cmd);
                         }
-                        else {
+                        else if (cmd.rendering) {
                             // Finish previous batch
                             cc.renderer._batchRendering();
-                            cmd.transform(this);
                             cmd.rendering(cc._renderContext);
                         }
                         break;
                 }
             } else if (selBone instanceof cc.Node) {
                 selBone.setShaderProgram(this._shaderProgram);
-                cmd = selBone._renderCmd;
-                cmd.transform(this);
-                if (cmd.uploadData) {
-                    cc.renderer._uploadBufferData(cmd);
+                boneCmd._syncStatus(parentCmd);
+                if (boneCmd.uploadData) {
+                    cc.renderer._uploadBufferData(boneCmd);
                 }
-                else if (cmd.rendering) {
+                else if (boneCmd.rendering) {
                     // Finish previous batch
                     cc.renderer._batchRendering();
-                    cmd.rendering(cc._renderContext);
+                    boneCmd.rendering(cc._renderContext);
                 }
             }
         }
@@ -119,6 +120,7 @@
     proto._updateColorAndOpacity = function(skinRenderCmd, bone){
         //update displayNode's color and opacity
         var parentColor = bone._renderCmd._displayedColor, parentOpacity = bone._renderCmd._displayedOpacity;
+
         var flags = cc.Node._dirtyFlags, locFlag = skinRenderCmd._dirtyFlag;
         var colorDirty = locFlag & flags.colorDirty,
             opacityDirty = locFlag & flags.opacityDirty;
