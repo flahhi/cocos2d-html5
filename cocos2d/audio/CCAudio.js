@@ -835,6 +835,25 @@ cc.Audio.WebAudio.prototype = {
         },
 
         /**
+         * Preloading sound effects manually
+         * @param {String} url
+         * //example
+         * cc.audioEngine.preloadEffect(EFFECT_FILE);
+         */
+        preloadEffect: function (url) {
+            var self = this;
+            loader.useWebAudio = true;
+            cc.loader.load(url, function (audio) {
+                audio = cc.loader.getRes(url);
+                audio = audio.cloneNode();
+                if (!self._audioPool[url])
+                    self._audioPool[url] = [];
+                self._audioPool[url].push(audio);
+            });
+            loader.useWebAudio = false;
+        },
+
+        /**
          * End music and effects.
          */
         end: function(){
