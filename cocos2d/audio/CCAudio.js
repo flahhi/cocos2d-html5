@@ -541,15 +541,16 @@ cc.Audio.WebAudio.prototype = {
 
         /**
          * Rewind playing music.
+         * @param {Boolean} loop Whether the music loop or not after rewind.
          * @example
          * //example
          * cc.audioEngine.rewindMusic();
          */
-        rewindMusic: function(){
+        rewindMusic: function(loop){
             var audio = this._currMusic;
             if (audio){
                 audio.stop();
-                audio.play();
+                audio.play(0, loop || false);
             }
         },
 
