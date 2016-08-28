@@ -114,6 +114,8 @@ cc.screen = /** @lends cc.screen# */{
      * @param {Function} onFullScreenChange
      */
     requestFullScreen: function (element, onFullScreenChange) {
+        if (this.fullScreen()) return;
+
         if (!this._supportsFullScreen) {
             return;
         }
@@ -151,10 +153,10 @@ cc.screen = /** @lends cc.screen# */{
         var theScreen = this;
         // Function bind will be too complicated here because we need the callback function's reference to remove the listener
         function callback() {
-            touchTarget.removeEventListener(theScreen._touchEvent, callback);
+            //touchTarget.removeEventListener(theScreen._touchEvent, callback);
             theScreen.requestFullScreen(element, onFullScreenChange);
         }
-        this.requestFullScreen(element, onFullScreenChange);
+        //this.requestFullScreen(element, onFullScreenChange);
         touchTarget.addEventListener(this._touchEvent, callback);
     }
 };
